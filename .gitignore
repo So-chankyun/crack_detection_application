@@ -1,0 +1,2 @@
+*.pth
+./crack_detection/__pycache__
