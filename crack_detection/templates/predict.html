@@ -1,0 +1,13 @@
+{% extends "layout.html"%}
+{% block content %}
+    <div class="content-section">
+        <form method="GET" action="">
+            <div class="mb-3">
+                {% form.crack_image.label(class="form-control-label") %}
+                {% form.crack_image(class="form-control-file") %}
+                {% form.pred_image.label(class="form-control-label")%}
+                {% form.pred_image(class="form-control-file")%}
+            </div>
+        </form>
+    </div>
+{% endblock content%}
