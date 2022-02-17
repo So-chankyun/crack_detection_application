@@ -1,0 +1,21 @@
+{% extends "layout.html"%}
+{% block content %}
+    <div class="content-section">
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="mb-3 mt-3">
+                {% if form.crack_video.errors %}
+                {{ form.crack_video(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.crack_video.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    {{form.crack_video(class="form-control-file")}}
+                {% endif %}
+            </div>
+            {{ form.submit(class="btn btn-secondary btn-sm")}}
+        </form>
+    </div>
+{% endblock content%}

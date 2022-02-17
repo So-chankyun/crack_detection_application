@@ -1,0 +1,17 @@
+{% extends "layout.html"%}
+{% block content %}
+    <div class="content-section">
+        <form method="GET" action="">
+            <div class="mb-3">
+                {% for field in form.result_list %}
+                    <video>
+                        <source src="{{ field.crack_video.data }}">True Video</video>
+                    </video>
+                    <video>
+                        <source src="{{ field.pred_video.data }}">Predict Video</video>
+                    </video>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+{% endblock content %}
