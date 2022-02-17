@@ -17,12 +17,11 @@ MODEL_PATH = os.path.join(detection_folder,'Unet(50k using data, epoch15).pth')
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 def merge_img(frame, pred):
-    re_frm = cv2.resize(frame, dsize=(640, 384), interpolation=cv2.INTER_CUBIC)
+    re_frm = cv2.resize(frame, dsize=(854, 480), interpolation=cv2.INTER_CUBIC)
     add_mask = re_frm.copy()
-    pred = pred.reshape((384,640)).shape
-    # print(add_mask.shape)
-    # print(pred.reshape((384,640)).shape)
-    add_mask[pred !=0 ]=[0,255,0]
+    print(add_mask.shape)
+    print(pred.shape)
+    add_mask[pred[:,:] !=0 ]=[0,255,0]
 
     return add_mask
 
@@ -37,8 +36,8 @@ def merge_img(frame, pred):
   4. circulate 2~3 process
 '''
 def make_video(video_path,save_path,frame=15.0):
-    width  = 640
-    height = 384
+    width  = 854
+    height = 480
     frame_thred = 1.1
 
     capture = cv2.VideoCapture(video_path)

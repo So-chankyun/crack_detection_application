@@ -8,8 +8,7 @@ import torchvision.transforms as tr
 
 detection_folder = './crack_detection/detection'
 MODEL_PATH = os.path.join(detection_folder,'Unet(50k using data, epoch15).pth')
-# DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-DEVICE = "cpu"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # 1. Load model
 def load_model():
@@ -28,21 +27,15 @@ def load_data(path,data_type):
     elif data_type == 'video':
         img = Image.fromarray(path)
 
-    transform = tr.Compose([tr.Resize((640,384))
-                            ,tr.ToTensor()
-                            ,tr.Normalize((0.0,0.0,0.0),(255.0,255.0,255.0))
-                            ])
-
-    # transform image
-    tensor_img = transform(img).unsqueeze(0)
-    tensor_img.to(DEVICE)
+    img = img.resize((854, 480))
+    tensor_img = tr.ToTensor()(img).unsqueeze(0)
 
     return tensor_img
 
 # 3. prediction
 def predict(path,data_type):
     model = load_model()
-    pred = model(load_data(path,data_type))
+    pred = model(load_data(path,data_type).to(DEVICE))
     pred = torch.argmax(F.softmax(pred,dim=1),dim=1).float().cpu()
     convert_img = tr.ToPILImage()(pred)
 

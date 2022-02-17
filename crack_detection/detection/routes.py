@@ -30,6 +30,7 @@ def img_predict():
     pred_path = []
     for i in range(len(img_list)):
         pred_path.append(os.path.join(pred_folder,img_name_list[i]+'_pred'+ext))
+        print(pred)
         pred[i].save(pred_path[i])
 
     # url_for 객체를 저장한다.
@@ -37,8 +38,8 @@ def img_predict():
     result_url = []
 
     for name in img_name_list:
-        img_file = url_for('static/true/img',filename=name+ext)
-        pred_file = url_for('static/pred/img',filename=name+'_pred'+ext)
+        img_file = url_for('static',filename='/true/img/'+name+ext)
+        pred_file = url_for('static',filename='/pred/img/'+name+'_pred'+ext)
         result_url.append(result(img_file,pred_file))
 
     data = {'result_list':result_url}
@@ -72,8 +73,8 @@ def video_predict():
         predict_video.make_video(video_path_list[i],pred_path) # 변환하고 바로 저장.
 
         # url_for 객체를 저장한다.
-        video_file = url_for('static/true/video',filename=video_name+ext)
-        pred_file = url_for('static/pred/video',filename=video_name+'_pred'+ext)
+        video_file = url_for('static',filename='/true/video/'+video_name+ext)
+        pred_file = url_for('static',filename='/pred/video/'+video_name+'_pred'+ext)
         result_url.append(result(video_file,pred_file))
 
     data = {'result_list':result_url}
