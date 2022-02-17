@@ -1,11 +1,19 @@
 {% extends "layout.html"%}
 {% block content %}
     <div class="content-section">
-        <form method="POST" action="">
-            <div class="mb-3">
-                {{form.crack_image.label(class="form-control-label")}}
-                {{form.crack_image(class="form-control-file")}}
-                <!-- input tag를 굳이 써야하나? -->
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="mb-3 mt-3">
+                {% if form.crack_image.errors %}
+                {{ form.crack_image(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.crack_image.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    {{form.crack_image(class="form-control-file")}}
+                {% endif %}
             </div>
             {{ form.submit(class="btn btn-secondary btn-sm")}}
         </form>

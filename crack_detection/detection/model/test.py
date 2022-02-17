@@ -23,7 +23,6 @@ def load_model():
 def load_data(img_path):
     # load image
     img = Image.open(img_path).convert('RGB')
-    img = img.resize((640,384))
 
     # transform image
     tensor_img = tr.ToTensor()(img).unsqueeze(0)

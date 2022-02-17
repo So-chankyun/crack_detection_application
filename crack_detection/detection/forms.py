@@ -7,6 +7,5 @@ from wtforms.validators import DataRequired
 # 출력하는 이미지
 class PredictionForm(FlaskForm):
     # mask_ratio = FloatField('Mask Ratio',validators=[DataRequired()])
-    # crack_image_path = StringField('Image',validators=[DataRequired()])
-    crack_image = FileField('Image',validators=[FileAllowed(['png','jpg'])])
-    pred_image = FileField('Prediction',validators=[FileAllowed(['png','jpg'])])
+    crack_image = StringField('Image',validators=[DataRequired()])
+    pred_image = StringField('Prediction',validators=[DataRequired()])

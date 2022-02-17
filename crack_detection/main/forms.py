@@ -7,3 +7,4 @@ from wtforms.validators import DataRequired
 class TargetForm(FlaskForm):
     crack_image = FileField('Image',validators=[FileAllowed(['jpg','png'])])
     submit = SubmitField('Predict')
+
