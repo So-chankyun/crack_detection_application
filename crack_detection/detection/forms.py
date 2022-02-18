@@ -15,6 +15,7 @@ class VideoForm(FlaskForm):
 
 class PredictedImageForm(FlaskForm):
     result_list = FieldList(FormField(ImageForm),min_entries=1)
+    resolution = StringField('Resolution')
 
 class PredictedVideoForm(FlaskForm):
     result_list = FieldList(FormField(VideoForm),min_entries=1)

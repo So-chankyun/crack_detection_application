@@ -12,6 +12,12 @@ detection = Blueprint('detection', __name__)
 
 @detection.route("/img_predict", methods=['GET','POST'])
 def img_predict():
+    form = PredictedImageForm()
+
+    # 해상도 지정
+    resolution = {'1':(960,540),'2':(1280,720),'3':(1920,1080)}
+    width, height = resolution[form.resolution]
+
     # 경로지정
     img_folder = os.path.join(current_app.root_path,'static/true/img')
     pred_folder = os.path.join(current_app.root_path,'static/pred/img')
@@ -23,7 +29,7 @@ def img_predict():
     img_name_list = [os.path.splitext(file_name)[0]  for file_name in img_list]
     img_path_list = [os.path.join(img_folder,file_name) for file_name in img_list]
 
-    pred = [test.predict(path,'image') for path in tqdm(img_path_list)]
+    pred = [test.predict(path,'image',width,height) for path in tqdm(img_path_list)]
 
     print('store')
     # store pred
