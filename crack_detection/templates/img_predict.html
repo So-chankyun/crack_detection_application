@@ -8,6 +8,7 @@
                     <img src="{{ field.pred_image.data }}">
                 {% endfor %}
             </div>
+            <a href="{{ url_for('detection.img_download') }}">Download</a>
         </form>
     </div>
 {% endblock content %}

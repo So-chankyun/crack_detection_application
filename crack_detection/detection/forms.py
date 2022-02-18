@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import FloatField, StringField, FieldList, FormField
+from wtforms import FloatField, StringField, FieldList, FormField, SubmitField
 from wtforms.validators import DataRequired
 
 
@@ -15,6 +15,8 @@ class VideoForm(FlaskForm):
 
 class PredictedImageForm(FlaskForm):
     result_list = FieldList(FormField(ImageForm),min_entries=1)
+    download = SubmitField('Download')
 
 class PredictedVideoForm(FlaskForm):
     result_list = FieldList(FormField(VideoForm),min_entries=1)
+

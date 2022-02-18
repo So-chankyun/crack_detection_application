@@ -1,5 +1,5 @@
 from flask import (render_template, url_for, flash,
-                   redirect, request, abort, current_app,Blueprint)
+                   redirect, request, abort, current_app,Blueprint, send_file)
 from crack_detection.detection.forms import PredictedImageForm, PredictedVideoForm
 from crack_detection.detection.model import test
 from crack_detection.detection.utils import predict_video
@@ -7,6 +7,7 @@ from PIL import Image
 import os
 from tqdm import tqdm
 from collections import namedtuple
+import shutil
 
 detection = Blueprint('detection', __name__)
 
@@ -47,6 +48,20 @@ def img_predict():
     form = PredictedImageForm(data=data)
 
     return render_template('img_predict.html',form=form)
+
+@detection.route("/pred_img_download")
+def img_download():
+    # db에서 유저를 구별하여 해당 폴더를 다운로드 할수 있도록 해야한다.
+    # db구성을 어떻게 해야하나...
+    # 일단은 해당 폴더를 지정하여 저장이되는지 한번 살펴보자
+    path = os.path.join(current_app.root_path,"static/pred/")
+    print(path)
+    # zip file 저장
+    shutil.make_archive(path+'pred','zip',path+'img') 
+
+    return send_file(os.path.join(current_app.root_path,path,'pred.zip'),
+                    attachment_filename="pred.zip",
+                    as_attachment=True)
 
 @detection.route("/video_predict", methods=['GET','POST'])
 def video_predict():
