@@ -8,6 +8,7 @@ import os
 from tqdm import tqdm
 from collections import namedtuple
 import shutil
+import torchvision.transforms as tr
 
 def get_client_info():
     APP_ROOT_PATH = current_app.root_path
@@ -37,7 +38,9 @@ def img_predict():
     img_name_list = [os.path.splitext(file_name)[0]  for file_name in img_list]
     img_path_list = [os.path.join(img_folder,file_name) for file_name in img_list]
 
-    pred = [test.predict(path,'image') for path in tqdm(img_path_list)]
+    # load model
+    model = test.load_model()
+    pred = [tr.ToPILImage(test.predict(path,'image',model)) for path in tqdm(img_path_list)]
 
     print('store')
     # store pred
@@ -67,8 +70,8 @@ def img_predict():
 
     return render_template('img_predict.html',form=form)
 
-@detection.route("/pred_img_download")
-def img_download():
+@detection.route("/download")
+def download():
     # db에서 유저를 구별하여 해당 폴더를 다운로드 할수 있도록 해야한다.
     # db구성을 어떻게 해야하나...
     # 일단은 해당 폴더를 지정하여 저장이되는지 한번 살펴보자
@@ -85,16 +88,18 @@ def img_download():
 
 @detection.route("/video_predict", methods=['GET','POST'])
 def video_predict():
+
+    client_ip, client_folder = get_client_info()
+
     # 경로지정
-    video_folder = os.path.join(current_app.root_path,'static/true/video')
-    pred_folder = os.path.join(current_app.root_path,'static/pred/video')
+    video_folder = os.path.join(client_folder,'true/video')
+    pred_folder = os.path.join(client_folder,'pred/video')
 
     # 예측
     print('predict')
     video_list = os.listdir(video_folder)
-    print()
     ext = os.path.splitext(video_list[0])[1]
-    video_name_list = [os.path.splitext(file_name)[0]  for file_name in video_list]
+    video_name_list = [os.path.splitext(file_name)[0] for file_name in video_list]
     video_path_list = [os.path.join(video_folder,file_name) for file_name in video_list]
 
     result = namedtuple('result',['crack_video','pred_video'])
@@ -105,11 +110,11 @@ def video_predict():
     pred_path = []
     for i, video_name in tqdm(enumerate(video_name_list)):
         pred_path = os.path.join(pred_folder,video_name+'_pred'+ext)
-        predict_video.make_video(video_path_list[i],pred_path) # 변환하고 바로 저장.
+        predict_video.make_video(video_path_list[i],pred_path,pred_folder) # 변환하고 바로 저장.
 
         # url_for 객체를 저장한다.
-        video_file = url_for('static',filename='/true/video/'+video_name+ext)
-        pred_file = url_for('static',filename='/pred/video/'+video_name+'_pred'+ext)
+        video_file = url_for('static',filename=client_ip+'/true/video/'+video_name+ext)
+        pred_file = url_for('static',filename=client_ip+'/pred/video/'+video_name+'_pred'+ext)
         result_url.append(result(video_file,pred_file))
 
     data = {'result_list':result_url}

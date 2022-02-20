@@ -10,7 +10,7 @@ class ImageForm(FlaskForm):
     pred_image = StringField('Prediction',validators=[DataRequired()])
 
 class VideoForm(FlaskForm):
-    crack_video = StringField('Image',validators=[DataRequired()])
+    crack_video = StringField('Video',validators=[DataRequired()])
     pred_video = StringField('Prediction',validators=[DataRequired()])
 
 class PredictedImageForm(FlaskForm):
@@ -19,4 +19,4 @@ class PredictedImageForm(FlaskForm):
 
 class PredictedVideoForm(FlaskForm):
     result_list = FieldList(FormField(VideoForm),min_entries=1)
-
+    download = SubmitField('Download')

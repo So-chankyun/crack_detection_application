@@ -33,13 +33,11 @@ def load_data(path,data_type):
     return tensor_img
 
 # 3. prediction
-def predict(path,data_type):
-    model = load_model()
+def predict(path,data_type,model):
     pred = model(load_data(path,data_type).to(DEVICE))
-    pred = torch.argmax(F.softmax(pred,dim=1),dim=1).float().cpu()
-    convert_img = tr.ToPILImage()(pred)
+    pred = torch.argmax(F.softmax(pred,dim=1),dim=1).squeeze(0).float().cpu()
 
-    return convert_img
+    return pred
 
 
 

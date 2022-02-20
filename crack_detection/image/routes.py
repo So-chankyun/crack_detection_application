@@ -28,9 +28,11 @@ def input():
             
             # ip주소로 이루어진 폴더가 존재하는가?
             if os.path.exists(client_folder):
-                shutil.rmtree(client_folder,ignore_errors=True)
-
-            os.mkdir(client_folder)
+                shutil.rmtree(client_folder+'/true/img',ignore_errors=True)
+                shutil.rmtree(client_folder+'/pred/img',ignore_errors=True)
+            else:
+                os.mkdir(client_folder)
+            
             os.makedirs(client_folder+'/true/img')
             os.makedirs(client_folder+'/pred/img')
 

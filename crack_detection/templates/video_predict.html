@@ -3,15 +3,9 @@
     <div class="content-section">
         <form method="GET" action="">
             <div class="mb-3">
-                {% for field in form.result_list %}
-                    <video>
-                        <source src="{{ field.crack_video.data }}">True Video</video>
-                    </video>
-                    <video>
-                        <source src="{{ field.pred_video.data }}">Predict Video</video>
-                    </video>
-                {% endfor %}
+                If you want to download predict video, click on Download botton
             </div>
+            <a href="{{ url_for('detection.download') }}">Download</a>
         </form>
     </div>
 {% endblock content %}
