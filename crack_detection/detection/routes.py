@@ -9,6 +9,7 @@ from tqdm import tqdm
 from collections import namedtuple
 import shutil
 import torchvision.transforms as tr
+import ast
 
 def get_client_info():
     APP_ROOT_PATH = current_app.root_path
@@ -21,53 +22,55 @@ def get_client_info():
 
 detection = Blueprint('detection', __name__)
 
-@detection.route("/img_predict", methods=['GET','POST'])
-def img_predict():
+@detection.route("/img_predict/<data>", methods=['GET','POST'])
+def img_predict(data):
+    data = ast.literal_eval(data)
 
-    client_ip, client_folder = get_client_info()
-    
-    # 경로지정
-    img_folder = os.path.join(client_folder,'true/img')
-    pred_folder = os.path.join(client_folder,'pred/img')
+    if data:
+        # 해상도 값 저장
+        resolution = {"qHD":(960,540),"HD":(1280,720),"FHD":(1920,1080)}
+        size = resolution[data["resolution"]]
 
-    # 예측
-    print('predict')
-    img_list = os.listdir(img_folder)
-    print(img_list)
-    ext = os.path.splitext(img_list[0])[1]
-    img_name_list = [os.path.splitext(file_name)[0]  for file_name in img_list]
-    img_path_list = [os.path.join(img_folder,file_name) for file_name in img_list]
+        client_ip, client_folder = get_client_info()
+        
+        # 경로지정
+        img_folder = os.path.join(client_folder,'true/img')
+        pred_folder = os.path.join(client_folder,'pred/img')
 
-    # load model
-    model = test.load_model()
-    pred = [tr.ToPILImage(test.predict(path,'image',model)) for path in tqdm(img_path_list)]
+        # 예측
+        print('predict')
+        img_list = os.listdir(img_folder)
+        ext = os.path.splitext(img_list[0])[1]
+        img_name_list = [os.path.splitext(file_name)[0]  for file_name in img_list]
+        img_path_list = [os.path.join(img_folder,file_name) for file_name in img_list]
 
-    print('store')
-    # store pred
-    pred_path = []
-    for i in range(len(img_list)):
-        pred_path.append(os.path.join(pred_folder,img_name_list[i]+'_pred'+ext))
-        pred[i].save(pred_path[i])
-        print(pred_path[i])
+        # load model
+        model = test.load_model()
+        pred = [tr.ToPILImage()(test.predict(path,'image',model,size)) for path in tqdm(img_path_list)]
 
-    # url_for 객체를 저장한다.
-    result = namedtuple('result',['crack_image','pred_image'])
-    result_url = []
+        print('store')
+        # store pred
+        pred_path = []
+        for i in range(len(img_list)):
+            pred_path.append(os.path.join(pred_folder,img_name_list[i]+'_pred'+ext))
+            pred[i].save(pred_path[i])
+            print(pred_path[i])
 
-    for name in img_name_list:
-        # img_file_name = os.path.join(client_ip,'true/img/'+name+ext)
-        # pred_file_name = os.path.join(client_ip,'pred/img/'+name+'_pred'+ext)
-        # print('img_file_name : {}'.format(img_file_name))
+        # url_for 객체를 저장한다.
+        result = namedtuple('result',['crack_image','pred_image'])
+        result_url = []
 
-        img_file_url = url_for('static',filename=client_ip+'/true/img/'+name+ext)
-        pred_file_url = url_for('static',filename=client_ip+'/pred/img/'+name+'_pred'+ext)
-        print(img_file_url)
-        result_url.append(result(img_file_url,pred_file_url))
+        for name in img_name_list:
+            img_file_url = url_for('static',filename=client_ip+'/true/img/'+name+ext)
+            pred_file_url = url_for('static',filename=client_ip+'/pred/img/'+name+'_pred'+ext)
+            print(img_file_url)
+            result_url.append(result(img_file_url,pred_file_url))
 
-    data = {'result_list':result_url}
+        data = {'result_list':result_url}
 
-    form = PredictedImageForm(data=data)
+        form = PredictedImageForm(data=data)
 
+        return render_template('img_predict.html',form=form)
     return render_template('img_predict.html',form=form)
 
 @detection.route("/download")
@@ -86,8 +89,19 @@ def download():
                     attachment_filename="pred.zip",
                     as_attachment=True)
 
-@detection.route("/video_predict", methods=['GET','POST'])
-def video_predict():
+@detection.route("/video_predict/<data>", methods=['GET','POST'])
+def video_predict(data):
+    data = ast.literal_eval(data)
+
+    print(data)
+
+    # 해상도 값 저장
+    resolution = {"qHD":(960,540),"HD":(1280,720),"FHD":(1920,1080)}
+    size = resolution[data["resolution"]]
+    frame = data['frame']
+    threshold = data['threshold']
+
+    print(frame,threshold)
 
     client_ip, client_folder = get_client_info()
 
@@ -110,7 +124,7 @@ def video_predict():
     pred_path = []
     for i, video_name in tqdm(enumerate(video_name_list)):
         pred_path = os.path.join(pred_folder,video_name+'_pred'+ext)
-        predict_video.make_video(video_path_list[i],pred_path,pred_folder) # 변환하고 바로 저장.
+        predict_video.make_video(video_path_list[i],pred_path,pred_folder,frame=frame,size=size,threshold=threshold) # 변환하고 바로 저장.
 
         # url_for 객체를 저장한다.
         video_file = url_for('static',filename=client_ip+'/true/video/'+video_name+ext)

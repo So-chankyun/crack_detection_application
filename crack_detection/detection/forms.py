@@ -20,3 +20,4 @@ class PredictedImageForm(FlaskForm):
 class PredictedVideoForm(FlaskForm):
     result_list = FieldList(FormField(VideoForm),min_entries=1)
     download = SubmitField('Download')
+    

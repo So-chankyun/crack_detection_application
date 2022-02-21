@@ -2,20 +2,94 @@
 {% block content %}
     <div class="content-section">
         <form method="POST" action="" enctype="multipart/form-data">
-            {{ form.hidden_tag() }}
-            <div class="mb-3 mt-3">
-                {% if form.crack_video.errors %}
-                {{ form.crack_video(class="form-control form-control-lg is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.crack_video.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
+            <div class="form-group">
+                {{ form.hidden_tag() }}
+                <label class="font-weight-bold h5" for="inputResolution">Resolution</label>
+                    <div class="input-group mt-1 mb-2">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="inputGroupSelect01">Resolution</label>
+                        </div>
+                            {% if form.resolution.errors %}
+                                {{ form.resolution(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.resolution.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.resolution(class="custom-select",class="inputGroupSelect01") }}
+                            {% endif %}
+                    </div>
+                    <small id="resolutionHelp" class="form-text text-muted" style="margin:0px">입력하는 사진의 해상도보다 높지않아야 합니다.</small>
+            </div>
+            <div class="form-group mt-3">
+                <label class="h5">{{form.frame.label}}</label>
+                <div class="input-group mb-2">
+                    {% if form.frame.errors %}
+                        {{ form.frame(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.frame.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        
+                        {{ form.frame(class="form-range", id="frameRange", step="5.0")}}
+                        <span id="frameValLabel">Value: <span id="frameValue">3</span></span>
+                    {% endif %} 
                 </div>
-                {% else %}
-                    {{form.crack_video(class="form-control-file")}}
-                {% endif %}
+            </div>
+            <div class="form-group mt-3">
+                <div class="input-group mt-2 mb-2">
+                    <label class="h5">{{ form.threshold.label }}</label>
+                    {% if form.threshold.errors %}
+                        {{ form.threshold(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.threshold.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.threshold(class="form-range", id="thresholdRange", step="0.1")}}
+                        <span id="thresholdValLabel">Value: <span id="thresholdValue">3</span></span>
+                    {% endif %}
+                </div>  
+            </div>
+            <div class="form-group mt-3 mb-4">
+                <label class="h5">{{form.crack_video.label}}</label>
+                <div class="mb-2 mt-2">
+                    {% if form.crack_video.errors %}
+                    {{ form.crack_video(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.crack_video.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        {{form.crack_video(class="form-control-file")}}
+                    {% endif %}
+                </div>
             </div>
             {{ form.submit(class="btn btn-secondary btn-sm")}}
         </form>
     </div>
+    <script>
+        var frame_slider = document.getElementById("frameRange");
+        var threshold_slider = document.getElementById("thresholdRange");
+
+        var frame_val = document.getElementById("frameValue");
+        var threshold_val = document.getElementById("thresholdValue");
+
+        frame_val.innerHTML = frame_slider.value; // Display the default slider value
+        threshold_val.innerHTML = threshold_slider.value; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        frame_slider.oninput = function() {
+            frame_val.innerHTML = this.value+"fps";
+        }
+
+        threshold_slider.oninput = function() {
+            threshold_val.innerHTML = this.value+"%";
+        }
+    </script>
 {% endblock content%}

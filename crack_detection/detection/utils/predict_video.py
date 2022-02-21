@@ -17,8 +17,8 @@ detection_folder = './crack_detection/detection'
 MODEL_PATH = os.path.join(detection_folder,'Unet(50k using data, epoch15).pth')
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-def merge_img(frame, pred):
-    re_frm = cv2.resize(frame, dsize=(854, 480), interpolation=cv2.INTER_CUBIC)
+def merge_img(frame, pred,size):
+    re_frm = cv2.resize(frame, dsize=size, interpolation=cv2.INTER_CUBIC)
     add_mask = re_frm.copy()
     add_mask[pred[:,:] !=0 ]=[0,255,0]
 
@@ -35,10 +35,10 @@ def merge_img(frame, pred):
   3. Predict
   4. circulate 2~3 process
 '''
-def make_video(video_path,save_path,pred_folder,frame=15.0):
-    width  = 854
-    height = 480
-    frame_thred = 0.7
+def make_video(video_path,save_path,pred_folder,size=(960,540),frame=15.0,threshold=1.0):
+    width, height = size
+    frame_thred = threshold
+    frame = frame
 
     capture = cv2.VideoCapture(video_path)
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,width) # 일단은 고정된 사이즈로 가자
@@ -52,7 +52,6 @@ def make_video(video_path,save_path,pred_folder,frame=15.0):
 
     model = test.load_model()
 
-
     while cv2.waitKey(33) < 0:
         count+=1
         full_frame = capture.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -61,10 +60,9 @@ def make_video(video_path,save_path,pred_folder,frame=15.0):
             print("프레임을 수신할 수 없습니다. 종료 중 ...")
             break
 
-        pred_img = np.asarray(test.predict(frame,'video',model))
-        # 예측 진행. tensor -> image-> array, 시간 소요가 너무 오래 걸리면 이를 수정할 필요가 있다.
-        convert_img = merge_img(frame, pred_img)
-        CRPF = np.round((pred_img.reshape(-1).sum()/(width*height))*100, 2)
+        pred_img = np.asarray(test.predict(frame,'video',model,size))
+        convert_img = merge_img(frame, pred_img,size)
+        CRPF = np.round((pred_img.reshape(-1).sum()/(size[0]*size[1]))*100, 2)
         max_ratio = CRPF if CRPF > max_ratio else max_ratio
         avg_ratio = (avg_ratio*(count-1)+CRPF)/count
 
@@ -76,6 +74,7 @@ def make_video(video_path,save_path,pred_folder,frame=15.0):
         color = (50,50,165) if CRPF > frame_thred else (50,165,50)
         
         cv2.putText(convert_img, 'Crt Rae : {:.2f} {}'.format(CRPF, "%"), (5, 20), font, .6, color, 2)
+        store_img = convert_img.copy()
         cv2.putText(convert_img, 'Max Rate : {:.2f} {}'.format(max_ratio, "%"), (5, 40), font, .6, (60,180,255), 2)
         cv2.putText(convert_img, 'Avg Rate : {:.2f} {}'.format(avg_ratio, "%"), (5, 60), font, .6, (60,180,255), 2)
         cv2.putText(convert_img, 
@@ -89,8 +88,7 @@ def make_video(video_path,save_path,pred_folder,frame=15.0):
         if CRPF > frame_thred:
             print(f'current crack ratio : {CRPF}%')
             outfile = os.path.join(pred_folder,'capture',f"{count}.jpg")
-            print(outfile)
-            cv2.imwrite(outfile, convert_img)
+            cv2.imwrite(outfile, store_img)
 
         out.write(convert_img)
 

@@ -2,20 +2,43 @@
 {% block content %}
     <div class="content-section">
         <form method="POST" action="" enctype="multipart/form-data">
+            <div class="form-group">
             {{ form.hidden_tag() }}
-            <div class="mb-3 mt-3">
-                {% if form.crack_image.errors %}
-                {{ form.crack_image(class="form-control form-control-lg is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.crack_image.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
+            <label class="font-weight-bold h5" for="inputResolution">Resolution</label>
+                <div class="input-group mt-2 mb-2">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">Resolution</label>
+                    </div>
+                        {% if form.resolution.errors %}
+                            {{ form.resolution(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.resolution.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.resolution(class="custom-select",class="inputGroupSelect01") }}
+                        {% endif %}
                 </div>
-                {% else %}
-                    {{form.crack_image(class="form-control-file")}}
-                {% endif %}
+                <small id="resolutionHelp" class="form-text text-muted" style="margin:0px">입력하는 사진의 해상도보다 높지않아야 합니다.</small>
             </div>
-            {{ form.submit(class="btn btn-secondary btn-sm")}}
+            <div class="form-group mt-3">
+                <label for="inputImage" class="h5">Image</label>  
+                <div class="input-group mb-2 mt-2">
+                    {% if form.crack_image.errors %}
+                    {{ form.crack_image(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.crack_image.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        {{form.crack_image(class="form-control-file")}}
+                    {% endif %}
+                </div>
+            </div>
+            {{ form.submit(class="btn btn-secondary btn-sm",style="margin-top:1rem")}}
+            </fieldset>
         </form>
     </div>
 {% endblock content%}

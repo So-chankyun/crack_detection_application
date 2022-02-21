@@ -20,21 +20,21 @@ def load_model():
     return model
 
 # 2. Data load and transforms
-def load_data(path,data_type):
+def load_data(path,data_type,size):
     # load image
     if data_type == 'image':
         img = Image.open(path).convert('RGB')
     elif data_type == 'video':
         img = Image.fromarray(path)
 
-    img = img.resize((854, 480))
+    img = img.resize(size)
     tensor_img = tr.ToTensor()(img).unsqueeze(0)
 
     return tensor_img
 
 # 3. prediction
-def predict(path,data_type,model):
-    pred = model(load_data(path,data_type).to(DEVICE))
+def predict(path,data_type,model,size):
+    pred = model(load_data(path,data_type,size).to(DEVICE))
     pred = torch.argmax(F.softmax(pred,dim=1),dim=1).squeeze(0).float().cpu()
 
     return pred

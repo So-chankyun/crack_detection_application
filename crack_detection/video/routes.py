@@ -17,6 +17,9 @@ def input():
         # 그리고 predict로 이동
 
         video_files = form.crack_video.data
+        resolution = form.resolution.data
+        frame = form.frame.data
+        threshold = form.threshold.data
 
         # 일단은 저장하지말고 바로 predict로 보내보자.
         if video_files:
@@ -44,6 +47,13 @@ def input():
                 video.save(store_path)
 
             flash("File successfully uploaded")
+            
+            print(frame, threshold)
+            print(type(frame), type(threshold))
 
-        return redirect(url_for('detection.video_predict'))
+            data = {"resolution":resolution,
+                    "frame":float(frame),
+                    "threshold":float(threshold)}
+ 
+        return redirect(url_for('detection.video_predict',data=data))
     return render_template('video.html',form=form)
