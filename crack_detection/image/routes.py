@@ -35,12 +35,18 @@ image = Blueprint('image',__name__)
 def input():
     target_form = TargetForm()
     # 만약 데이터가 입력되지 않은 상태라면
+    print(target_form.resolution.data)
+    print(target_form.crack_image.data)
+
     if target_form.validate_on_submit():
         # 만약 올바르게 데이터가 제출되었고, 이미지가 제대로 들어왔다면 DB에 저장.
         # 그리고 predict로 이동
+        pred_form = PredictedImageForm()
 
         img_files = target_form.crack_image.data
-        resolution = target_form.resolution.data
+        resolution = target_form.resolution.data # 선택된 해상도를 저장. 
+        print(resolution)
+        print(img_files)
 
         if img_files:
             pred_form = PredictedImageForm()
@@ -49,7 +55,5 @@ def input():
 
             flash("File successfully uploaded")
 
-        data = {"resolution":resolution}
-
-        return redirect(url_for('detection.img_predict',data=data))
+        return render_template('img_predict.html',form=pred_form,resolution=resolution)
     return render_template('image.html',form=target_form)

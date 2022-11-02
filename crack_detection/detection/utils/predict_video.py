@@ -17,8 +17,8 @@ detection_folder = './crack_detection/detection'
 MODEL_PATH = os.path.join(detection_folder,'Unet(50k using data, epoch15).pth')
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-def merge_img(frame, pred,size):
-    re_frm = cv2.resize(frame, dsize=size, interpolation=cv2.INTER_CUBIC)
+def merge_img(frame, pred,width,height):
+    re_frm = cv2.resize(frame, dsize=(width, height), interpolation=cv2.INTER_CUBIC)
     add_mask = re_frm.copy()
     add_mask[pred[:,:] !=0 ]=[0,255,0]
 
@@ -34,12 +34,17 @@ def merge_img(frame, pred,size):
   2. Load Data
   3. Predict
   4. circulate 2~3 process
-'''
-def make_video(video_path,save_path,pred_folder,size=(960,540),frame=15.0,threshold=1.0):
-    width, height = size
-    frame_thred = threshold
-    frame = frame
 
+* Parameter *
+  - video_path : 원본비디오 경로
+  - save_path : 예측비디오 저장 경로
+  - width : capture할 이미지의 너비
+  - height : capture할 이미지의 높이
+  - frame : 초당 frame수
+  - frame_thred
+'''
+def make_video(video_path,save_path,width=854, height=480, frame=15.0,frame_thred = 1.1):
+    
     capture = cv2.VideoCapture(video_path)
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,width) # 일단은 고정된 사이즈로 가자
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,height)
@@ -60,15 +65,13 @@ def make_video(video_path,save_path,pred_folder,size=(960,540),frame=15.0,thresh
             print("프레임을 수신할 수 없습니다. 종료 중 ...")
             break
 
-        pred_img = np.asarray(test.predict(frame,'video',model,size))
-        convert_img = merge_img(frame, pred_img,size)
-        CRPF = np.round((pred_img.reshape(-1).sum()/(size[0]*size[1]))*100, 2)
-        max_ratio = CRPF if CRPF > max_ratio else max_ratio
-        avg_ratio = (avg_ratio*(count-1)+CRPF)/count
+        pred_img = np.asarray(test.predict(frame,'video',width,height))
+        # 예측 진행. tensor -> image-> array, 시간 소요가 너무 오래 걸리면 이를 수정할 필요가 있다.
+        convert_img = merge_img(frame, pred_img,width,height)
+        CRPF = np.round((pred_img.reshape(-1).sum()/(width*height))*100, 2)
 
-        """
-        ########### args.frame_thred 이상이 됐을 때 캡처 (추가 예정) ###########
-        """
+        # max_ratio = CRPF if CRPF > max_ratio else max_ratio
+        # avg_ratio = (avg_ratio*(count-1)+CRPF)/count
 
         font=cv2.FONT_HERSHEY_SIMPLEX
         color = (50,50,165) if CRPF > frame_thred else (50,165,50)
